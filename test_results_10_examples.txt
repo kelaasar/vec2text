@@ -1,0 +1,151 @@
+======================================================================
+Loading your trained corrector model...
+======================================================================
+Loading inversion model from: /scratch/kelaasar/vec2text/saves/gtr-1/checkpoint-34194
+Loading corrector model from: /scratch/kelaasar/vec2text/saves/gtr-corrector-4gpu-2epochs
+
+Creating corrector trainer...
+
+✅ Models loaded successfully!
+======================================================================
+
+🎤 INTERACTIVE MODE
+======================================================================
+Enter sentences to test (type 'quit' or 'exit' to stop)
+======================================================================
+
+➤ Enter text: 
+⏳ Processing...
+
+======================================================================
+ORIGINAL: 'The quick brown fox jumps over the lazy dog.'
+======================================================================
+
+[0 steps] Brown fox jumps over the lazy dog quickly.
+[1 step]  Brown fox jumps over the lazy dog quickly.
+[2 steps] The lazy dog jumps over the brown fox quickly.
+[5 steps] Quickly, the lazy dog jumps over the brown fox.
+======================================================================
+
+➤ Enter text: 
+⏳ Processing...
+
+======================================================================
+ORIGINAL: 'Machine learning is revolutionizing artificial intelligence.'
+======================================================================
+
+[0 steps] Machine learning is revolutionizing artificial intelligence.
+[1 step]  Machine learning is revolutionizing artificial intelligence.
+[2 steps] Machine learning is revolutionizing artificial intelligence.
+[5 steps] Machine learning is revolutionizing artificial intelligence.
+======================================================================
+
+➤ Enter text: 
+⏳ Processing...
+
+======================================================================
+ORIGINAL: 'Python is a versatile programming language used in data science.'
+======================================================================
+
+[0 steps] Python is a versatile programming language used in data science.
+[1 step]  Python is a versatile programming language used in data science.
+[2 steps] Python is a versatile programming language used in data science.
+[5 steps] Python is a versatile programming language used in data science.
+======================================================================
+
+➤ Enter text: 
+⏳ Processing...
+
+======================================================================
+ORIGINAL: 'Climate change is affecting global weather patterns.'
+======================================================================
+
+[0 steps] Climate patterns is changing global climate. It affects the weather globally.
+[1 step]  Climate patterns is changing global climate. It affects the weather globally.
+[2 steps] Global climate patterns are changing. It affects weather patterns around the world.
+[5 steps] Global climate patterns are changing. It affects global weather patterns.
+======================================================================
+
+➤ Enter text: 
+⏳ Processing...
+
+======================================================================
+ORIGINAL: 'Quantum computing could transform cryptography and optimization.'
+======================================================================
+
+[0 steps] Quantum computing could transform algorithms and optimize optimization in cryptography.
+[1 step]  Quantum computing could transform algorithms and optimize optimization in cryptography.
+[2 steps] Quantum computing could transform and optimize cryptography.
+[5 steps] Quantum computing could transform into optimization and cryptography.
+======================================================================
+
+➤ Enter text: 
+⏳ Processing...
+
+======================================================================
+ORIGINAL: 'The stock market experienced significant volatility today.'
+======================================================================
+
+[0 steps] Today's stock market experienced significant volatility. The stock market was volatile.
+[1 step]  Today's stock market experienced significant volatility. The stock market was volatile.
+[2 steps] Today's stock market experienced significant volatility. The stock market was experiencing significant volatility today.
+[5 steps] The stock market experienced significant volatility today.
+======================================================================
+
+➤ Enter text: 
+⏳ Processing...
+
+======================================================================
+ORIGINAL: 'Renewable energy sources are becoming more cost-effective.'
+======================================================================
+
+[0 steps] Renewable energy sources are becoming more cost-effective.
+[1 step]  Renewable energy sources are becoming more cost-effective.
+[2 steps] Renewable energy sources are becoming more cost-effective.
+[5 steps] Renewable energy sources are becoming more cost-effective.
+======================================================================
+
+➤ Enter text: 
+⏳ Processing...
+
+======================================================================
+ORIGINAL: 'Neural networks can recognize patterns in complex data.'
+======================================================================
+
+[0 steps] Neural networks can recognize patterns in complex data.
+[1 step]  Neural networks can recognize patterns in complex data.
+[2 steps] Neural networks can recognize patterns in complex data.
+[5 steps] Neural networks can recognize patterns in complex data.
+======================================================================
+
+➤ Enter text: 
+⏳ Processing...
+
+======================================================================
+ORIGINAL: 'Space exploration continues to push the boundaries of human knowledge.'
+======================================================================
+
+[0 steps] Space exploration pushes the boundaries of human knowledge. This continues to push the boundaries.
+[1 step]  Space exploration pushes the boundaries of human knowledge. This continues to push the boundaries.
+[2 steps] Space exploration continues to push the boundaries of human knowledge.
+[5 steps] Space exploration continues to push the boundaries of human knowledge.
+======================================================================
+
+➤ Enter text: 
+⏳ Processing...
+
+======================================================================
+ORIGINAL: 'Effective communication is essential for team collaboration.'
+======================================================================
+
+[0 steps] Effective communication is essential for team collaboration.
+[1 step]  Effective communication is essential for team collaboration.
+[2 steps] Effective communication is essential for team collaboration.
+[5 steps] Effective communication is essential for team collaboration.
+======================================================================
+
+➤ Enter text: 
+👋 Goodbye!
+I1019 17:47:59.186490 1612058 torch/_dynamo/utils.py:399] TorchDynamo compilation metrics:
+I1019 17:47:59.186490 1612058 torch/_dynamo/utils.py:399] Function    Runtimes (s)
+I1019 17:47:59.186490 1612058 torch/_dynamo/utils.py:399] ----------  --------------
