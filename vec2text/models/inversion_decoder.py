@@ -72,9 +72,15 @@ class InversionModelDecoderOnly(InversionModel):
 
         if embedder_model_api:
             assert use_frozen_embeddings_as_input, "must precompute embeddings w/ api"
-            # Hard-code OpenAI embedding dim
-            self.embedder_dim = 1536
-            bottleneck_dim = 1536
+            # Set OpenAI embedding dimensions based on model
+            if embedder_model_api in ["text-embedding-ada-002", "text-embedding-3-small"]:
+                self.embedder_dim = 1536
+            elif embedder_model_api == "text-embedding-3-large":
+                self.embedder_dim = 3072
+            else:
+                # Default to 1536 for backwards compatibility
+                self.embedder_dim = 1536
+            bottleneck_dim = self.embedder_dim
         # elif use_frozen_embeddings_as_input:
         #     # temp hack to set fixed sentence embedding size to 512 for luar.
         #     # TODO do this in a smarter way (figure it out from data? or make it an arg.)

@@ -14,13 +14,100 @@ os.environ['VEC2TEXT_CACHE'] = '/scratch/kelaasar/vec2text_cache'
 # Set device
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+# Model configurations
+MODELS = {
+    "1": {
+        "name": "GTR-base",
+        "inversion": "/scratch/kelaasar/vec2text/saves/gtr-1/checkpoint-34194",
+        "corrector": "/scratch/kelaasar/vec2text/saves/gtr-corrector-4gpu-2epochs"
+    },
+    "2": {
+        "name": "text-embedding-3-small (OpenAI) - Original",
+        "inversion": "/scratch/kelaasar/vec2text/saves/openai-3small-inverter/checkpoint-341930",
+        "corrector": "/scratch/kelaasar/vec2text/saves/openai-3small-corrector"
+    },
+    "3": {
+        "name": "text-embedding-3-small (OpenAI) - Fixed/Retrained",
+        "inversion": "/scratch/kelaasar/vec2text/saves/openai-3small-inverter-fixed/checkpoint-136772",
+        "corrector": "/scratch/kelaasar/vec2text/saves/openai-3small-corrector-fixed"
+    }
+}
+
+# Predefined test examples
+PREDEFINED_EXAMPLES = [
+    "The quick brown fox jumps over the lazy dog.",
+    "Machine learning is revolutionizing artificial intelligence.",
+    "Python is a versatile programming language used in data science.",
+    "Climate change is affecting global weather patterns.",
+    "Quantum computing could transform cryptography and optimization.",
+    "The stock market experienced significant volatility today.",
+    "Renewable energy sources are becoming more cost-effective.",
+    "Neural networks can recognize patterns in complex data.",
+    "Space exploration continues to push the boundaries of human knowledge.",
+    "Effective communication is essential for team collaboration."
+]
+
+# Let user choose model
+print("="*70)
+print("📊 AVAILABLE MODELS")
+print("="*70)
+for key, model_info in MODELS.items():
+    print(f"  {key}. {model_info['name']}")
+print("="*70)
+
+while True:
+    choice = input("\n➤ Select model (1, 2, or 3): ").strip()
+    if choice in MODELS:
+        break
+    print("❌ Invalid choice. Please enter 1, 2, or 3.")
+
+selected_model = MODELS[choice]
+print(f"\n✅ Selected: {selected_model['name']}")
+
+# Ask for test mode
+print("\n" + "="*70)
+print("🧪 TEST MODE")
+print("="*70)
+print("  1. Run 10 predefined examples (batch mode)")
+print("  2. Interactive mode (enter your own text)")
+print("="*70)
+
+while True:
+    mode_choice = input("\n➤ Select test mode (1 or 2): ").strip()
+    if mode_choice in ["1", "2"]:
+        break
+    print("❌ Invalid choice. Please enter 1 or 2.")
+
+use_predefined = (mode_choice == "1")
+
+# Ask for maximum number of correction steps
+print("\n" + "="*70)
+print("🔢 CORRECTION STEPS")
+print("="*70)
+print("Enter the maximum number of correction steps to test.")
+print("The program will show results from 0 steps up to your chosen number.")
+print("(Recommended: 2-10, but you can choose any positive number)")
+print("="*70)
+
+while True:
+    try:
+        max_steps = input("\n➤ Enter max correction steps (e.g., 5): ").strip()
+        max_steps = int(max_steps)
+        if max_steps >= 0:
+            break
+        print("❌ Please enter a non-negative number.")
+    except ValueError:
+        print("❌ Invalid input. Please enter a number.")
+
+print(f"\n✅ Will test from 0 to {max_steps} correction steps")
+
 # Load models (only once)
 print("="*70)
 print("Loading your trained corrector model...")
 print("="*70)
 
-inversion_checkpoint = "/scratch/kelaasar/vec2text/saves/gtr-1/checkpoint-34194"
-corrector_checkpoint = "/scratch/kelaasar/vec2text/saves/gtr-corrector-4gpu-2epochs"
+inversion_checkpoint = selected_model["inversion"]
+corrector_checkpoint = selected_model["corrector"]
 
 print(f"Loading inversion model from: {inversion_checkpoint}")
 inversion_model = InversionModel.from_pretrained(inversion_checkpoint)
@@ -34,44 +121,22 @@ corrector.model.to(device)
 corrector.inversion_trainer.model.to(device)
 
 print("\n✅ Models loaded successfully!")
+print(f"🎯 Using: {selected_model['name']}")
 print("="*70)
 
-def invert_text(text):
-    """Invert text and return results at each step."""
-    # Get hypothesis (0 steps)
-    hypothesis_text = vec2text.invert_strings(
-        strings=[text],
-        corrector=corrector,
-        num_steps=0,
-    )[0]
+def invert_text(text, max_steps):
+    """Invert text and return results at each step from 0 to max_steps."""
+    results = {}
     
-    # After 1 correction step
-    corrected_1_text = vec2text.invert_strings(
-        strings=[text],
-        corrector=corrector,
-        num_steps=1,
-    )[0]
+    for step in range(max_steps + 1):
+        inverted = vec2text.invert_strings(
+            strings=[text],
+            corrector=corrector,
+            num_steps=step,
+        )[0]
+        results[step] = inverted
     
-    # After 2 correction steps
-    corrected_2_text = vec2text.invert_strings(
-        strings=[text],
-        corrector=corrector,
-        num_steps=2,
-    )[0]
-    
-    # After 5 correction steps
-    corrected_5_text = vec2text.invert_strings(
-        strings=[text],
-        corrector=corrector,
-        num_steps=5,
-    )[0]
-    
-    return {
-        'hypothesis': hypothesis_text,
-        'step_1': corrected_1_text,
-        'step_2': corrected_2_text,
-        'step_5': corrected_5_text,
-    }
+    return results
 
 def print_results(text, results):
     """Pretty print the results."""
@@ -79,38 +144,56 @@ def print_results(text, results):
     print(f"ORIGINAL: '{text}'")
     print("="*70)
     
-    print(f"\n[0 steps] {results['hypothesis']}")
-    print(f"[1 step]  {results['step_1']}")
-    print(f"[2 steps] {results['step_2']}")
-    print(f"[5 steps] {results['step_5']}")
+    for step in sorted(results.keys()):
+        step_label = f"[{step} step{'s' if step != 1 else ''}]" if step > 0 else "[0 steps]"
+        print(f"\n{step_label} {results[step]}")
     print("="*70)
 
-# Interactive loop
-print("\n🎤 INTERACTIVE MODE")
-print("="*70)
-print("Enter sentences to test (type 'quit' or 'exit' to stop)")
-print("="*70)
+# Run tests based on selected mode
+if use_predefined:
+    # Batch mode with predefined examples
+    print("\n🧪 BATCH TEST MODE")
+    print("="*70)
+    print(f"Testing {len(PREDEFINED_EXAMPLES)} predefined examples...")
+    print("="*70)
+    
+    for i, text in enumerate(PREDEFINED_EXAMPLES, 1):
+        print(f"\n[Example {i}/{len(PREDEFINED_EXAMPLES)}]")
+        print("⏳ Processing...")
+        results = invert_text(text, max_steps)
+        print_results(text, results)
+    
+    print("\n" + "="*70)
+    print("✅ Batch testing completed!")
+    print("="*70)
+    
+else:
+    # Interactive loop
+    print("\n🎤 INTERACTIVE MODE")
+    print("="*70)
+    print("Enter sentences to test (type 'quit' or 'exit' to stop)")
+    print("="*70)
 
-while True:
-    try:
-        user_input = input("\n➤ Enter text: ").strip()
-        
-        if user_input.lower() in ['quit', 'exit', 'q']:
-            print("\n👋 Goodbye!")
+    while True:
+        try:
+            user_input = input("\n➤ Enter text: ").strip()
+            
+            if user_input.lower() in ['quit', 'exit', 'q']:
+                print("\n👋 Goodbye!")
+                break
+            
+            if not user_input:
+                print("⚠️  Please enter some text.")
+                continue
+            
+            print("\n⏳ Processing...")
+            results = invert_text(user_input, max_steps)
+            print_results(user_input, results)
+            
+        except KeyboardInterrupt:
+            print("\n\n👋 Interrupted. Goodbye!")
             break
-        
-        if not user_input:
-            print("⚠️  Please enter some text.")
-            continue
-        
-        print("\n⏳ Processing...")
-        results = invert_text(user_input)
-        print_results(user_input, results)
-        
-    except KeyboardInterrupt:
-        print("\n\n👋 Interrupted. Goodbye!")
-        break
-    except Exception as e:
-        print(f"\n❌ Error: {e}")
-        import traceback
-        traceback.print_exc()
+        except Exception as e:
+            print(f"\n❌ Error: {e}")
+            import traceback
+            traceback.print_exc()

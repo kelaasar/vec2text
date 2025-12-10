@@ -7,7 +7,7 @@ import transformers
 import vec2text
 from vec2text.models.model_utils import device
 
-SUPPORTED_MODELS = ["text-embedding-ada-002", "gtr-base"]
+SUPPORTED_MODELS = ["text-embedding-ada-002", "text-embedding-3-small", "text-embedding-3-large", "gtr-base"]
 
 
 def load_pretrained_corrector(embedder: str) -> vec2text.trainers.Corrector:

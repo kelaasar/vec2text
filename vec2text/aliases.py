@@ -32,6 +32,11 @@ CHECKPOINT_FOLDERS_DICT = {
     #   https://wandb.ai/jack-morris/emb-inv-3/runs/d8319570c0314d95b2a9746f849e6218/overview?workspace=user-jxmorris12
     # "gtr_msmarco__msl128__100epoch": "/home/jxm3/research/retrieval/inversion/saves/d6312870a6f49dee914198d048ee88f4",
     "gtr_msmarco__msl128__100epoch": "/home/wentingz/research/vec2text/vec2text/saves/gtr-1",
+    "gtr_msmarco__msl128__2epoch": "/scratch/kelaasar/vec2text/saves/gtr-1",
+    # text-embedding-3-small inverter (5 epochs trained - OVERTRAINED):
+    "openai_3small_msmarco__msl128__5epoch": "/scratch/kelaasar/vec2text/saves/openai-3small-inverter",
+    # text-embedding-3-small inverter (2 epochs trained - FIXED):
+    "openai_3small_msmarco__msl128__2epoch_fixed": "/scratch/kelaasar/vec2text/saves/openai-3small-inverter-fixed",
     # openai hypothesis model [sl32] [still training, loss 1.233, bleu 29...] https://wandb.ai/jack-morris/emb-inv-3/runs/9b5d4aac9b16dad6d4a8c65cbc1a8859?workspace=user-jxmorris12
     "openai_msmarco__msl32__100epoch": "/home/jxm3/research/retrieval/inversion/saves/61becf9bb1d627272cd1923ac4871e73",
     # openai corrector model [sl32] [loss 0.77, bleu 45]

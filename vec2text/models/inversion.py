@@ -79,8 +79,14 @@ class InversionModel(transformers.PreTrainedModel):
         encoder_hidden_dim = self.encoder_decoder.config.hidden_size
         if embedder_model_api:
             assert use_frozen_embeddings_as_input, "must precompute embeddings w/ api"
-            # Hard-code OpenAI embedding dim
-            self.embedder_dim = 1536
+            # Set OpenAI embedding dimensions based on model
+            if embedder_model_api in ["text-embedding-ada-002", "text-embedding-3-small"]:
+                self.embedder_dim = 1536
+            elif embedder_model_api == "text-embedding-3-large":
+                self.embedder_dim = 3072
+            else:
+                # Default to 1536 for backwards compatibility
+                self.embedder_dim = 1536
             bottleneck_dim = self.embedder_dim
         elif isinstance(embedder, SentenceTransformer):
             self.embedder_dim = embedder.get_sentence_embedding_dimension()

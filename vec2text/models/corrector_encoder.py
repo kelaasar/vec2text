@@ -23,7 +23,14 @@ class CorrectorEncoderModel(transformers.PreTrainedModel):
     ):
         super().__init__(config=config)
         if config.embedder_model_api:
-            embedder_dim = 1536
+            # Set OpenAI embedding dimensions based on model
+            if config.embedder_model_api in ["text-embedding-ada-002", "text-embedding-3-small"]:
+                embedder_dim = 1536
+            elif config.embedder_model_api == "text-embedding-3-large":
+                embedder_dim = 3072
+            else:
+                # Default to 1536 for backwards compatibility
+                embedder_dim = 1536
         else:
             embedder_dim = 768
         bottleneck_dim = embedder_dim

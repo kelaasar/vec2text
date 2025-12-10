@@ -6,6 +6,7 @@ slurm-*.out
 .ipynb_checkpoints/
 *cache/
 venv/*
+.env
 
 build/
 dist/

@@ -164,16 +164,123 @@ class Corrector(BaseTrainer):
         if not os.path.exists(cache_path):
             print(f"\t[{dataset.builder_name}] Saving hypotheses to path {cache_path}")
 
-            dataset = dataset_map_multi_worker(
-                dataset=dataset,
-                map_fn=functools.partial(
-                    self._precompute_hypothesis_and_embedding,
-                    collator=self.data_collator,
-                ),
-                batched=True,
-                batch_size=(self.args.train_batch_size * 2),
-                desc="Precomputing hypotheses for data",
+            # Monkey-patch file operations to track WHERE files are being written
+            import builtins
+            import shutil
+            original_open = builtins.open
+            write_locations = {}
+            
+            def tracked_open(file, mode='r', *args, **kwargs):
+                # Track any file opens for writing
+                if 'w' in mode or 'a' in mode:
+                    abs_path = os.path.abspath(file) if not os.path.isabs(file) else file
+                    if abs_path not in write_locations:
+                        write_locations[abs_path] = 0
+                        print(f"[FILE WRITE TRACKER] Opening file for writing: {abs_path}")
+                        print(f"[FILE WRITE TRACKER]   - Directory: {os.path.dirname(abs_path)}")
+                        print(f"[FILE WRITE TRACKER]   - Mode: {mode}")
+                        # Check which filesystem this is on
+                        try:
+                            disk = shutil.disk_usage(os.path.dirname(abs_path))
+                            print(f"[FILE WRITE TRACKER]   - Disk free: {disk.free/1024**3:.1f}GB")
+                        except:
+                            pass
+                return original_open(file, mode, *args, **kwargs)
+            
+            builtins.open = tracked_open
+            
+            # Also track Arrow-specific operations
+            try:
+                import pyarrow as pa
+                from datasets import arrow_writer
+                original_arrow_init = arrow_writer.ArrowWriter.__init__
+                
+                def tracked_arrow_init(self, *args, **kwargs):
+                    if 'path' in kwargs and kwargs['path']:
+                        print(f"[ARROW TRACKER] ArrowWriter created with path: {kwargs['path']}")
+                        print(f"[ARROW TRACKER]   - Resolved: {os.path.abspath(kwargs['path'])}")
+                    elif len(args) > 2 and args[2]:  # path is 3rd positional arg
+                        print(f"[ARROW TRACKER] ArrowWriter created with path: {args[2]}")
+                        print(f"[ARROW TRACKER]   - Resolved: {os.path.abspath(args[2])}")
+                    return original_arrow_init(self, *args, **kwargs)
+                
+                arrow_writer.ArrowWriter.__init__ = tracked_arrow_init
+            except Exception as e:
+                print(f"[TRACKER] Warning: Could not patch Arrow writer: {e}")
+
+            # Add disk monitoring wrapper
+            original_map_fn = functools.partial(
+                self._precompute_hypothesis_and_embedding,
+                collator=self.data_collator,
             )
+            
+            # Track progress for disk monitoring
+            progress_tracker = {'count': 0, 'last_percent': -1}
+            total_examples = len(dataset)
+            
+            def map_fn_with_monitoring(examples):
+                fn_result = original_map_fn(examples)
+                progress_tracker['count'] += len(examples['input_ids'])
+                current_percent = int((progress_tracker['count'] / total_examples) * 100)
+                
+                # Print disk usage every 1% progress
+                if current_percent > progress_tracker['last_percent']:
+                    progress_tracker['last_percent'] = current_percent
+                    
+                    # Check /home usage
+                    home_usage = shutil.disk_usage('/home/kelaasar')
+                    scratch_usage = shutil.disk_usage('/scratch')
+                    
+                    print(f"\n{'='*70}")
+                    print(f"[DISK MONITOR] Progress: {current_percent}% ({progress_tracker['count']:,}/{total_examples:,})")
+                    print(f"[DISK MONITOR] /home/kelaasar: {home_usage.used/1024**3:.1f}GB used, {home_usage.free/1024**3:.1f}GB free")
+                    print(f"[DISK MONITOR] /scratch: {scratch_usage.used/1024**3:.1f}GB used, {scratch_usage.free/1024**3:.1f}GB free")
+                    
+                    # Check if HF datasets cache dir exists and its usage
+                    hf_cache_home = '/home/kelaasar/.cache/huggingface'
+                    hf_cache_scratch = '/scratch/.cache/huggingface'
+                    if os.path.exists(hf_cache_home):
+                        try:
+                            import subprocess
+                            du_result = subprocess.run(['du', '-sh', hf_cache_home], capture_output=True, text=True, timeout=5)
+                            print(f"[DISK MONITOR] {hf_cache_home}: {du_result.stdout.strip()}")
+                        except:
+                            pass
+                    if os.path.exists(hf_cache_scratch):
+                        try:
+                            import subprocess
+                            du_result = subprocess.run(['du', '-sh', hf_cache_scratch], capture_output=True, text=True, timeout=5)
+                            print(f"[DISK MONITOR] {hf_cache_scratch}: {du_result.stdout.strip()}")
+                        except:
+                            pass
+                    print(f"{'='*70}\n")
+                
+                return fn_result
+
+            try:
+                dataset = dataset_map_multi_worker(
+                    dataset=dataset,
+                    map_fn=map_fn_with_monitoring,
+                    batched=True,
+                    batch_size=(self.args.train_batch_size * 2),
+                    desc="Precomputing hypotheses for data",
+                    num_proc=1,  # Disable multiprocessing to avoid CUDA fork errors
+                )
+            finally:
+                # Restore original functions
+                builtins.open = original_open
+                try:
+                    arrow_writer.ArrowWriter.__init__ = original_arrow_init
+                except:
+                    pass
+                
+                # Print summary of all write locations
+                print("\n" + "="*70)
+                print("[FILE WRITE TRACKER] SUMMARY - Files opened for writing:")
+                print("="*70)
+                for path in sorted(write_locations.keys()):
+                    print(f"  {path}")
+                print("="*70 + "\n")
 
             if filter_correct_examples:
                 old_length = len(dataset)
@@ -723,6 +830,7 @@ class Corrector(BaseTrainer):
         model: CorrectorEncoderModel,
         inputs: Dict[str, torch.Tensor],
         return_outputs: bool = False,
+        num_items_in_batch: Optional[int] = None,
     ) -> Union[Tuple[torch.Tensor, Dict[str, torch.Tensor]], torch.Tensor]:
         batch_size, seq_length = inputs["input_ids"].shape
 
