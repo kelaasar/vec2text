@@ -1,0 +1,113 @@
+================================================================================
+TRAINING COMMANDS FOR OPENAI TEXT-EMBEDDING-3-SMALL MODELS (FIXED VERSION)
+================================================================================
+
+These are the commands used to train your openai-3small-inverter-fixed and 
+openai-3small-corrector-fixed models that completed successfully.
+
+================================================================================
+1. INVERTER TRAINING COMMAND
+================================================================================
+
+TMPDIR=/scratch/tmp \
+VEC2TEXT_CACHE=/scratch/kelaasar/vec2text_cache \
+HF_DATASETS_CACHE=/scratch/.cache/huggingface/datasets \
+CUDA_VISIBLE_DEVICES=2,4,5,6,7 \
+nohup python3.9 vec2text/run.py \
+    --per_device_train_batch_size 128 \
+    --per_device_eval_batch_size 128 \
+    --max_seq_length 128 \
+    --model_name_or_path t5-base \
+    --embedder_model_api text-embedding-3-small \
+    --num_repeat_tokens 16 \
+    --embedder_torch_dtype float16 \
+    --num_train_epochs 2 \
+    --max_eval_samples 500 \
+    --eval_steps 20000 \
+    --warmup_steps 625 \
+    --use_wandb=True \
+    --lr_scheduler_type constant_with_warmup \
+    --exp_group_name fixed-openai-3small \
+    --learning_rate 0.001 \
+    --output_dir ./saves/openai-3small-inverter-fixed \
+    --save_steps 20000 \
+    --logging_steps 25 \
+    --use_frozen_embeddings_as_input True \
+    --experiment inversion \
+    --bf16=False \
+    --report_to wandb \
+    --overwrite_output_dir \
+    > logs/inverter/training_openai_3small_inverter_fixed_$(date +"%Y%m%d_%H%M%S").log 2>&1 &
+
+Key details:
+- Final checkpoint used: ./saves/openai-3small-inverter-fixed/checkpoint-136772
+- Training completed: Nov 2, 2025
+- Batch size: 128 per device
+- Learning rate: 0.001
+- Warmup steps: 625
+- Epochs: 2
+- Used 5 GPUs: 2,4,5,6,7
+
+================================================================================
+2. CORRECTOR TRAINING COMMAND  
+================================================================================
+
+TMPDIR=/scratch/tmp \
+VEC2TEXT_CACHE=/scratch/kelaasar/vec2text_cache \
+HF_DATASETS_CACHE=/scratch/.cache/huggingface/datasets \
+CUDA_VISIBLE_DEVICES=2,4,5,6,7 \
+nohup python3.9 vec2text/run.py \
+    --per_device_train_batch_size 16 \
+    --per_device_eval_batch_size 16 \
+    --max_seq_length 128 \
+    --model_name_or_path t5-base \
+    --embedder_model_api text-embedding-3-small \
+    --num_repeat_tokens 16 \
+    --embedder_torch_dtype float16 \
+    --corrector_model_from_pretrained ./saves/openai-3small-inverter-fixed/checkpoint-136772 \
+    --num_train_epochs 2 \
+    --max_eval_samples 500 \
+    --eval_steps 2000 \
+    --warmup_steps 20000 \
+    --use_wandb=True \
+    --lr_scheduler_type constant_with_warmup \
+    --exp_group_name feb_openai_corrector \
+    --learning_rate 0.001 \
+    --output_dir ./saves/openai-3small-corrector-fixed \
+    --save_steps 4000 \
+    --logging_steps 25 \
+    --use_frozen_embeddings_as_input True \
+    --experiment corrector_encoder \
+    --bf16=False \
+    --gradient_accumulation_steps 3 \
+    --report_to wandb \
+    --overwrite_output_dir \
+    > logs/corrector/corrector_training_FIXED_$(date +"%Y%m%d_%H%M%S").log 2>&1 &
+
+Key details:
+- Training completed: Dec 10, 2025
+- Batch size: 16 per device (effective batch size: 240 with gradient accumulation)
+- Gradient accumulation steps: 3
+- Learning rate: 0.001
+- Warmup steps: 20000 (command line arg, though saved model shows 8000)
+- Epochs: 2
+- Runtime: ~48.5 hours
+- Used 5 GPUs: 2,4,5,6,7
+- Key fix: TMPDIR=/scratch/tmp to avoid disk space issues
+
+================================================================================
+IMPORTANT NOTES
+================================================================================
+
+1. The TMPDIR=/scratch/tmp environment variable was CRITICAL for success.
+   Without it, the training crashes at 71% due to /tmp running out of space.
+
+2. The corrector training required hypothesis precomputation which took
+   significant time and disk space (~263GB temp files + 192GB cache).
+
+3. Both models use the same hyperparameters as the GTR baseline for 
+   fair comparison.
+
+4. The inverter checkpoint-136772 was used as the base for corrector training.
+
+================================================================================

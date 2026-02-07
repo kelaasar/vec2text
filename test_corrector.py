@@ -22,14 +22,19 @@ MODELS = {
         "corrector": "/scratch/kelaasar/vec2text/saves/gtr-corrector-4gpu-2epochs"
     },
     "2": {
-        "name": "text-embedding-3-small (OpenAI) - Original",
-        "inversion": "/scratch/kelaasar/vec2text/saves/openai-3small-inverter/checkpoint-341930",
-        "corrector": "/scratch/kelaasar/vec2text/saves/openai-3small-corrector"
-    },
-    "3": {
-        "name": "text-embedding-3-small (OpenAI) - Fixed/Retrained",
+        "name": "text-embedding-3-small (OpenAI)",
         "inversion": "/scratch/kelaasar/vec2text/saves/openai-3small-inverter-fixed/checkpoint-136772",
         "corrector": "/scratch/kelaasar/vec2text/saves/openai-3small-corrector-fixed"
+    },
+    "3": {
+        "name": "gemini-embedding-001 (Google)",
+        "inversion": "/scratch/kelaasar/vec2text/saves/gemini-embedding-001-inverter",
+        "corrector": "/scratch/kelaasar/vec2text/saves/gemini-embedding-001-corrector"
+    },
+    "4": {
+        "name": "mistral-embed (Mistral AI)",
+        "inversion": "/scratch/kelaasar/vec2text/saves/mistral-embed-inverter/checkpoint-45592",
+        "corrector": "/scratch/kelaasar/vec2text/saves/mistral-embed-corrector/checkpoint-91010"
     }
 }
 
@@ -56,10 +61,10 @@ for key, model_info in MODELS.items():
 print("="*70)
 
 while True:
-    choice = input("\n➤ Select model (1, 2, or 3): ").strip()
+    choice = input("\n➤ Select model (1, 2, 3, or 4): ").strip()
     if choice in MODELS:
         break
-    print("❌ Invalid choice. Please enter 1, 2, or 3.")
+    print("❌ Invalid choice. Please enter 1, 2, 3, or 4.")
 
 selected_model = MODELS[choice]
 print(f"\n✅ Selected: {selected_model['name']}")
@@ -70,15 +75,66 @@ print("🧪 TEST MODE")
 print("="*70)
 print("  1. Run 10 predefined examples (batch mode)")
 print("  2. Interactive mode (enter your own text)")
+print("  3. Load embedding from file or paste directly")
 print("="*70)
 
 while True:
-    mode_choice = input("\n➤ Select test mode (1 or 2): ").strip()
-    if mode_choice in ["1", "2"]:
+    mode_choice = input("\n➤ Select test mode (1, 2, or 3): ").strip()
+    if mode_choice in ["1", "2", "3"]:
         break
-    print("❌ Invalid choice. Please enter 1 or 2.")
+    print("❌ Invalid choice. Please enter 1, 2, or 3.")
 
 use_predefined = (mode_choice == "1")
+use_embedding_input = (mode_choice == "3")
+
+# Handle embedding input mode
+if use_embedding_input:
+    print("\n" + "="*70)
+    print("📥 EMBEDDING INPUT")
+    print("="*70)
+    print("  1. Load from text file")
+    print("  2. Paste embedding directly")
+    print("="*70)
+    
+    while True:
+        embedding_input_mode = input("\n➤ Select input method (1 or 2): ").strip()
+        if embedding_input_mode in ["1", "2"]:
+            break
+        print("❌ Invalid choice. Please enter 1 or 2.")
+    
+    embedding_values = None
+    if embedding_input_mode == "1":
+        filepath = input("\n➤ Enter path to embedding text file: ").strip()
+        try:
+            with open(filepath, 'r') as f:
+                content = f.read().strip()
+                embedding_values = [float(x) for x in content.split(',')]
+            print(f"✅ Loaded {len(embedding_values)} values from {filepath}")
+        except Exception as e:
+            print(f"❌ Error loading file: {e}")
+            exit(1)
+    else:  # mode 2 - paste directly
+        print("\n➤ Paste embedding (comma-separated values):")
+        content = input().strip()
+        try:
+            embedding_values = [float(x) for x in content.split(',')]
+            print(f"✅ Loaded {len(embedding_values)} values")
+        except Exception as e:
+            print(f"❌ Error parsing embedding: {e}")
+            exit(1)
+    
+    # Verify dimensions
+    if 'gtr' in selected_model['name'].lower() or 'gemini' in selected_model['name'].lower():
+        expected_dim = 768
+    elif 'mistral' in selected_model['name'].lower():
+        expected_dim = 1024
+    else:
+        expected_dim = 1536
+    if len(embedding_values) != expected_dim:
+        print(f"\n⚠️  Warning: Expected {expected_dim} dimensions for {selected_model['name']} but got {len(embedding_values)}")
+        proceed = input("Continue anyway? (y/n): ").strip().lower()
+        if proceed != 'y':
+            exit(1)
 
 # Ask for maximum number of correction steps
 print("\n" + "="*70)
@@ -150,7 +206,37 @@ def print_results(text, results):
     print("="*70)
 
 # Run tests based on selected mode
-if use_predefined:
+if use_embedding_input:
+    # Embedding input mode
+    print("\n🔢 EMBEDDING INPUT MODE")
+    print("="*70)
+    print("Running inversion from provided embedding...")
+    print("="*70)
+    
+    # Convert embedding values to tensor
+    import torch
+    embedding_tensor = torch.tensor([embedding_values], dtype=torch.float32).to(device)
+    
+    # Run the corrector at different steps
+    print(f"\n⏳ Processing with 0 to {max_steps} correction steps...")
+    print("\n" + "="*70)
+    print("RESULTS FROM PROVIDED EMBEDDING")
+    print("="*70)
+    
+    for step in range(max_steps + 1):
+        outputs = vec2text.invert_embeddings(
+            embeddings=embedding_tensor,
+            corrector=corrector,
+            num_steps=step
+        )
+        step_label = f"[{step} step{'s' if step != 1 else ''}]" if step > 0 else "[0 steps]"
+        print(f"\n{step_label} {outputs[0]}")
+    
+    print("\n" + "="*70)
+    print("✅ Embedding inversion completed!")
+    print("="*70)
+
+elif use_predefined:
     # Batch mode with predefined examples
     print("\n🧪 BATCH TEST MODE")
     print("="*70)

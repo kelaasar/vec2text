@@ -84,6 +84,10 @@ class InversionModel(transformers.PreTrainedModel):
                 self.embedder_dim = 1536
             elif embedder_model_api == "text-embedding-3-large":
                 self.embedder_dim = 3072
+            elif embedder_model_api == "gemini-embedding-001":
+                self.embedder_dim = 768  # Default recommended size for Gemini
+            elif embedder_model_api.startswith("mistral-embed"):
+                self.embedder_dim = 1024  # Mistral embeddings
             else:
                 # Default to 1536 for backwards compatibility
                 self.embedder_dim = 1536

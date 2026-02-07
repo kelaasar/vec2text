@@ -3,9 +3,12 @@ bert_score
 datasets<4
 einops
 evaluate
+google-genai
+numpy
 openai
 optimum
 pre-commit
+python-dotenv
 rouge_score
 sacrebleu
 sentence_transformers

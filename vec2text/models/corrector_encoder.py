@@ -23,11 +23,15 @@ class CorrectorEncoderModel(transformers.PreTrainedModel):
     ):
         super().__init__(config=config)
         if config.embedder_model_api:
-            # Set OpenAI embedding dimensions based on model
+            # Set embedding dimensions based on API model
             if config.embedder_model_api in ["text-embedding-ada-002", "text-embedding-3-small"]:
                 embedder_dim = 1536
             elif config.embedder_model_api == "text-embedding-3-large":
                 embedder_dim = 3072
+            elif config.embedder_model_api.startswith("gemini-embedding"):
+                embedder_dim = 768
+            elif config.embedder_model_api.startswith("mistral-embed"):
+                embedder_dim = 1024
             else:
                 # Default to 1536 for backwards compatibility
                 embedder_dim = 1536

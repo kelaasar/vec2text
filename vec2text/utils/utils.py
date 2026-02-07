@@ -11,7 +11,7 @@ import numpy as np
 import torch
 import tqdm
 import transformers
-from tenacity import retry, stop_after_attempt, wait_fixed
+from tenacity import retry, stop_after_attempt, wait_fixed, wait_exponential
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -358,6 +358,104 @@ def get_embeddings_openai_manifest(
 
 
 @retry(wait=wait_fixed(1), stop=stop_after_attempt(10))
+def get_embeddings_gemini(
+    text_list, model="gemini-embedding-001", output_dimensionality=768
+) -> list:
+    """Get embeddings from Google Gemini API."""
+    from google import genai
+    from google.genai import types
+    import numpy as np
+    
+    api_key = os.getenv("GOOGLE_API_KEY")
+    if not api_key:
+        raise ValueError("GOOGLE_API_KEY not found in environment variables. Please set it in .env file.")
+    
+    client = genai.Client(api_key=api_key)
+    
+    # Map model names to correct API format
+    model_name_map = {
+        "gemini-embedding-001": "models/text-embedding-004",
+        "text-embedding-004": "models/text-embedding-004",
+        "models/text-embedding-004": "models/text-embedding-004"
+    }
+    api_model = model_name_map.get(model, model)
+    
+    # Process in batches (Gemini can handle multiple texts at once)
+    batch_size = 100  # Adjust based on API limits
+    batches = math.ceil(len(text_list) / batch_size)
+    outputs = []
+    
+    for batch in range(batches):
+        text_list_batch = text_list[batch * batch_size : (batch + 1) * batch_size]
+        
+        # Replace empty strings with placeholder
+        text_list_batch = [text if len(text) > 0 else "random sequence" for text in text_list_batch]
+        
+        result = client.models.embed_content(
+            model=api_model,
+            contents=text_list_batch,
+            config=types.EmbedContentConfig(
+                task_type="SEMANTIC_SIMILARITY",
+                output_dimensionality=output_dimensionality
+            )
+        )
+        
+        # Extract embeddings and normalize if not using 3072 dimensions
+        for embedding_obj in result.embeddings:
+            embedding_values = np.array(embedding_obj.values)
+            if output_dimensionality != 3072:
+                # Normalize for dimensions other than 3072
+                embedding_values = embedding_values / np.linalg.norm(embedding_values)
+            outputs.append(embedding_values.tolist())
+    
+    return outputs
+
+
+@retry(wait=wait_exponential(multiplier=1, min=4, max=120), stop=stop_after_attempt(50))
+def get_embeddings_mistral(
+    text_list, model="mistral-embed"
+) -> list:
+    """Get embeddings from Mistral API with resilient retry logic.
+    
+    Uses exponential backoff: 4s, 8s, 16s, 32s, 64s, 120s (max), with up to 50 attempts.
+    This allows the function to ride out temporary Mistral API outages during long training runs.
+    """
+    from mistralai import Mistral
+    import numpy as np
+    
+    api_key = os.getenv("MISTRAL_API_KEY")
+    if not api_key:
+        raise ValueError("MISTRAL_API_KEY not found in environment variables. Please set it in .env file.")
+    
+    client = Mistral(api_key=api_key)
+    
+    # Process in batches
+    batch_size = 100  # Adjust based on API limits
+    batches = math.ceil(len(text_list) / batch_size)
+    outputs = []
+    
+    for batch in range(batches):
+        text_list_batch = text_list[batch * batch_size : (batch + 1) * batch_size]
+        
+        # Replace empty strings with placeholder
+        text_list_batch = [text if len(text) > 0 else "random sequence" for text in text_list_batch]
+        
+        result = client.embeddings.create(
+            model=model,
+            inputs=text_list_batch,
+        )
+        
+        # Extract embeddings and normalize (Mistral returns 1024 dimensions)
+        for embedding_obj in result.data:
+            embedding_values = np.array(embedding_obj.embedding)
+            # Normalize the embedding
+            embedding_values = embedding_values / np.linalg.norm(embedding_values)
+            outputs.append(embedding_values.tolist())
+    
+    return outputs
+
+
+@retry(wait=wait_fixed(1), stop=stop_after_attempt(10))
 def get_embeddings_openai_vanilla_multithread(
     text_list, model="text-embedding-ada-002"
 ) -> list:
@@ -434,6 +532,19 @@ def embed_api(
     # get_embeddings_func = get_embeddings_openai_manifest
     if api_name.startswith("text-embedding-ada") or api_name.startswith("text-embedding-3"):
         embeddings = get_embeddings_func(
+            text_list=text_list,
+            model=api_name,
+        )
+    elif api_name.startswith("gemini-embedding"):
+        # Gemini embeddings - default to 768 dimensions (recommended)
+        embeddings = get_embeddings_gemini(
+            text_list=text_list,
+            model=api_name,
+            output_dimensionality=768,
+        )
+    elif api_name.startswith("mistral-embed"):
+        # Mistral embeddings - 1024 dimensions
+        embeddings = get_embeddings_mistral(
             text_list=text_list,
             model=api_name,
         )
