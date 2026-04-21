@@ -368,47 +368,64 @@ def get_embeddings_gemini(
     
     api_key = os.getenv("GOOGLE_API_KEY")
     if not api_key:
-        raise ValueError("GOOGLE_API_KEY not found in environment variables. Please set it in .env file.")
+        raise ValueError(
+            "GOOGLE_API_KEY not found in environment variables. "
+            "Gemini embedding evaluation requires a valid Google API key."
+        )
     
     client = genai.Client(api_key=api_key)
-    
-    # Map model names to correct API format
-    model_name_map = {
-        "gemini-embedding-001": "models/text-embedding-004",
-        "text-embedding-004": "models/text-embedding-004",
-        "models/text-embedding-004": "models/text-embedding-004"
-    }
-    api_model = model_name_map.get(model, model)
-    
-    # Process in batches (Gemini can handle multiple texts at once)
-    batch_size = 100  # Adjust based on API limits
-    batches = math.ceil(len(text_list) / batch_size)
-    outputs = []
-    
-    for batch in range(batches):
-        text_list_batch = text_list[batch * batch_size : (batch + 1) * batch_size]
-        
-        # Replace empty strings with placeholder
-        text_list_batch = [text if len(text) > 0 else "random sequence" for text in text_list_batch]
-        
-        result = client.models.embed_content(
-            model=api_model,
-            contents=text_list_batch,
-            config=types.EmbedContentConfig(
-                task_type="SEMANTIC_SIMILARITY",
-                output_dimensionality=output_dimensionality
-            )
-        )
-        
-        # Extract embeddings and normalize if not using 3072 dimensions
-        for embedding_obj in result.embeddings:
-            embedding_values = np.array(embedding_obj.values)
-            if output_dimensionality != 3072:
-                # Normalize for dimensions other than 3072
-                embedding_values = embedding_values / np.linalg.norm(embedding_values)
-            outputs.append(embedding_values.tolist())
-    
-    return outputs
+
+    api_model_override = os.getenv("GOOGLE_GEMINI_EMBEDDING_MODEL")
+    model_names_to_try = [model]
+    if api_model_override and api_model_override not in model_names_to_try:
+        model_names_to_try.insert(0, api_model_override)
+
+    # Try candidate Gemini embedding models in order of likely availability.
+    # The current Google GenAI client typically accepts short model IDs like
+    # 'gemini-embedding-001' rather than fully-qualified 'models/...' names.
+    model_names_to_try.extend(
+        [
+            "gemini-embedding-001",
+            "models/gemini-embedding-001",
+            "models/embedding-001",
+            "models/text-embedding-004",
+            "models/text-embedding-preview-0814",
+            "models/gemini-embedding-exp-03-07",
+        ]
+    )
+
+    seen = set()
+    model_names_to_try = [m for m in model_names_to_try if not (m in seen or seen.add(m))]
+
+    for api_model in model_names_to_try:
+        try:
+            outputs = []
+            batch_size = 100
+            batches = math.ceil(len(text_list) / batch_size)
+            for batch in range(batches):
+                text_list_batch = text_list[batch * batch_size : (batch + 1) * batch_size]
+                text_list_batch = [text if len(text) > 0 else "random sequence" for text in text_list_batch]
+                result = client.models.embed_content(
+                    model=api_model,
+                    contents=text_list_batch,
+                    config=types.EmbedContentConfig(
+                        task_type="SEMANTIC_SIMILARITY",
+                        output_dimensionality=output_dimensionality,
+                    ),
+                )
+                for embedding_obj in result.embeddings:
+                    embedding_values = np.array(embedding_obj.values)
+                    if output_dimensionality != 3072:
+                        embedding_values = embedding_values / np.linalg.norm(embedding_values)
+                    outputs.append(embedding_values.tolist())
+            return outputs
+        except Exception as e:
+            print(f"Failed with Gemini model {api_model}: {e}")
+            continue
+    raise ValueError(
+        "All Gemini embedding model candidates failed. "
+        "Please verify GOOGLE_API_KEY, GOOGLE_GEMINI_EMBEDDING_MODEL, and supported Gemini model names."
+    )
 
 
 @retry(wait=wait_exponential(multiplier=1, min=4, max=120), stop=stop_after_attempt(50))

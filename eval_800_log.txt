@@ -1,0 +1,146 @@
+nohup: ignoring input
+Loading case study data from local files...
+  known_text:      800 samples
+  medical_text:    800 samples
+  unknown_text:    800 samples
+  paraphrase_text: 800 samples
+  code:            800 samples
+/home/kelaasar/.local/lib/python3.9/site-packages/matplotlib/projections/__init__.py:63: UserWarning: Unable to import Axes3D. This may be due to multiple versions of Matplotlib being installed (e.g. as a system package and as a pip package). As a result, the 3D projection is not available.
+  warnings.warn("Unable to import Axes3D. This may be due to multiple versions of "
+Loading model GTR-base...
+Loaded GTR-base
+Running case known_text for GTR-base (800 samples)
+Warning: Empty candidate sentence detected; setting raw BERTscores to 0.
+  known_text EM=0.091 BLEU=0.290 ROUGE-L=0.562 BERTScore=0.925
+Running case unknown_text for GTR-base (800 samples)
+Warning: Empty candidate sentence detected; setting raw BERTscores to 0.
+Warning: Empty candidate sentence detected; setting raw BERTscores to 0.
+Warning: Empty candidate sentence detected; setting raw BERTscores to 0.
+  unknown_text EM=0.000 BLEU=0.144 ROUGE-L=0.417 BERTScore=0.874
+Running case paraphrase_text for GTR-base (800 samples)
+  paraphrase_text EM=0.001 BLEU=0.244 ROUGE-L=0.542 BERTScore=0.911
+Running case medical_text for GTR-base (800 samples)
+  medical_text EM=0.147 BLEU=0.362 ROUGE-L=0.622 BERTScore=0.937
+Running case code for GTR-base (800 samples)
+  code EM=0.110 BLEU=0.358 ROUGE-L=0.631 BERTScore=0.939
+Loading model text-embedding-3-small...
+Loaded text-embedding-3-small
+Running case known_text for text-embedding-3-small (800 samples)
+  known_text EM=0.245 BLEU=0.413 ROUGE-L=0.722 BERTScore=0.951
+Running case unknown_text for text-embedding-3-small (800 samples)
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+Warning: Empty candidate sentence detected; setting raw BERTscores to 0.
+Warning: Empty candidate sentence detected; setting raw BERTscores to 0.
+Warning: Empty candidate sentence detected; setting raw BERTscores to 0.
+Warning: Empty candidate sentence detected; setting raw BERTscores to 0.
+Warning: Empty candidate sentence detected; setting raw BERTscores to 0.
+Warning: Empty candidate sentence detected; setting raw BERTscores to 0.
+Warning: Empty candidate sentence detected; setting raw BERTscores to 0.
+Warning: Empty candidate sentence detected; setting raw BERTscores to 0.
+Warning: Empty candidate sentence detected; setting raw BERTscores to 0.
+  unknown_text EM=0.024 BLEU=0.133 ROUGE-L=0.444 BERTScore=0.867
+Running case paraphrase_text for text-embedding-3-small (800 samples)
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+warning: set element 0 to a random sequence
+  paraphrase_text EM=0.025 BLEU=0.252 ROUGE-L=0.579 BERTScore=0.915
+Running case medical_text for text-embedding-3-small (800 samples)
+  medical_text EM=0.474 BLEU=0.633 ROUGE-L=0.861 BERTScore=0.979
+Running case code for text-embedding-3-small (800 samples)
+  code EM=0.217 BLEU=0.346 ROUGE-L=0.698 BERTScore=0.947
+Loading model mistral-embed...
+Loaded mistral-embed
+Running case known_text for mistral-embed (800 samples)
+  known_text EM=0.185 BLEU=0.299 ROUGE-L=0.636 BERTScore=0.937
+Running case unknown_text for mistral-embed (800 samples)
+Warning: Empty candidate sentence detected; setting raw BERTscores to 0.
+Warning: Empty candidate sentence detected; setting raw BERTscores to 0.
+Warning: Empty candidate sentence detected; setting raw BERTscores to 0.
+Warning: Empty candidate sentence detected; setting raw BERTscores to 0.
+Warning: Empty candidate sentence detected; setting raw BERTscores to 0.
+Warning: Empty candidate sentence detected; setting raw BERTscores to 0.
+Warning: Empty candidate sentence detected; setting raw BERTscores to 0.
+Warning: Empty candidate sentence detected; setting raw BERTscores to 0.
+Warning: Empty candidate sentence detected; setting raw BERTscores to 0.
+  unknown_text EM=0.004 BLEU=0.037 ROUGE-L=0.264 BERTScore=0.819
+Running case paraphrase_text for mistral-embed (800 samples)
+Warning: Empty candidate sentence detected; setting raw BERTscores to 0.
+Warning: Empty candidate sentence detected; setting raw BERTscores to 0.
+Warning: Empty candidate sentence detected; setting raw BERTscores to 0.
+Warning: Empty candidate sentence detected; setting raw BERTscores to 0.
+Warning: Empty candidate sentence detected; setting raw BERTscores to 0.
+  paraphrase_text EM=0.006 BLEU=0.138 ROUGE-L=0.440 BERTScore=0.887
+Running case medical_text for mistral-embed (800 samples)
+  medical_text EM=0.316 BLEU=0.514 ROUGE-L=0.754 BERTScore=0.962
+Running case code for mistral-embed (800 samples)
+  code EM=0.152 BLEU=0.266 ROUGE-L=0.648 BERTScore=0.936
+Wrote inversion_case_study_results_800.json
+I0414 20:26:12.776168 3747052 torch/_dynamo/utils.py:399] TorchDynamo compilation metrics:
+I0414 20:26:12.776168 3747052 torch/_dynamo/utils.py:399] Function    Runtimes (s)
+I0414 20:26:12.776168 3747052 torch/_dynamo/utils.py:399] ----------  --------------

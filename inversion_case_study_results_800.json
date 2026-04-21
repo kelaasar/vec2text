@@ -1,0 +1,198 @@
+{
+  "results": {
+    "GTR-base": {
+      "known_text": {
+        "exact_match": 0.09125,
+        "bleu": 0.2898525771843537,
+        "rouge_l": 0.5616962423650727,
+        "bertscore_f1": 0.9251711114495993
+      },
+      "unknown_text": {
+        "exact_match": 0.0,
+        "bleu": 0.14372778872265435,
+        "rouge_l": 0.416785706051918,
+        "bertscore_f1": 0.873980634957552
+      },
+      "paraphrase_text": {
+        "exact_match": 0.00125,
+        "bleu": 0.2436728059986132,
+        "rouge_l": 0.5424906359777677,
+        "bertscore_f1": 0.9107972652465105
+      },
+      "medical_text": {
+        "exact_match": 0.1475,
+        "bleu": 0.3615341673034458,
+        "rouge_l": 0.6215278596671894,
+        "bertscore_f1": 0.9374819759279489
+      },
+      "code": {
+        "exact_match": 0.11,
+        "bleu": 0.3582725832983437,
+        "rouge_l": 0.6305491507051494,
+        "bertscore_f1": 0.9391191562265158
+      }
+    },
+    "text-embedding-3-small": {
+      "known_text": {
+        "exact_match": 0.245,
+        "bleu": 0.4129829659985858,
+        "rouge_l": 0.7224844873831126,
+        "bertscore_f1": 0.9511713449656963
+      },
+      "unknown_text": {
+        "exact_match": 0.02375,
+        "bleu": 0.13263950724176432,
+        "rouge_l": 0.44417091513076795,
+        "bertscore_f1": 0.8674341248720885
+      },
+      "paraphrase_text": {
+        "exact_match": 0.025,
+        "bleu": 0.2519216361438987,
+        "rouge_l": 0.5785510946804959,
+        "bertscore_f1": 0.9147708212584257
+      },
+      "medical_text": {
+        "exact_match": 0.47375,
+        "bleu": 0.6329122634761222,
+        "rouge_l": 0.8614340539896157,
+        "bertscore_f1": 0.9786951030790806
+      },
+      "code": {
+        "exact_match": 0.2175,
+        "bleu": 0.34554012077821344,
+        "rouge_l": 0.6979464974889746,
+        "bertscore_f1": 0.9472858310490847
+      }
+    },
+    "mistral-embed": {
+      "known_text": {
+        "exact_match": 0.185,
+        "bleu": 0.29889438062214585,
+        "rouge_l": 0.6361350740087923,
+        "bertscore_f1": 0.9368265036493539
+      },
+      "unknown_text": {
+        "exact_match": 0.00375,
+        "bleu": 0.03702641301135537,
+        "rouge_l": 0.26376280131754704,
+        "bertscore_f1": 0.818683878108859
+      },
+      "paraphrase_text": {
+        "exact_match": 0.00625,
+        "bleu": 0.13775213240817683,
+        "rouge_l": 0.4402250539747179,
+        "bertscore_f1": 0.8868445114791393
+      },
+      "medical_text": {
+        "exact_match": 0.31625,
+        "bleu": 0.5135404336061431,
+        "rouge_l": 0.7537388351251515,
+        "bertscore_f1": 0.9623301491886377
+      },
+      "code": {
+        "exact_match": 0.1525,
+        "bleu": 0.26636385136899066,
+        "rouge_l": 0.6476197302255017,
+        "bertscore_f1": 0.936219633743167
+      }
+    }
+  },
+  "summary": {
+    "GTR-base": {
+      "known_text": {
+        "exact_match": 0.09125,
+        "bleu": 0.2898525771843537,
+        "rouge_l": 0.5616962423650727,
+        "bertscore_f1": 0.9251711114495993
+      },
+      "unknown_text": {
+        "exact_match": 0.0,
+        "bleu": 0.14372778872265435,
+        "rouge_l": 0.416785706051918,
+        "bertscore_f1": 0.873980634957552
+      },
+      "paraphrase_text": {
+        "exact_match": 0.00125,
+        "bleu": 0.2436728059986132,
+        "rouge_l": 0.5424906359777677,
+        "bertscore_f1": 0.9107972652465105
+      },
+      "medical_text": {
+        "exact_match": 0.1475,
+        "bleu": 0.3615341673034458,
+        "rouge_l": 0.6215278596671894,
+        "bertscore_f1": 0.9374819759279489
+      },
+      "code": {
+        "exact_match": 0.11,
+        "bleu": 0.3582725832983437,
+        "rouge_l": 0.6305491507051494,
+        "bertscore_f1": 0.9391191562265158
+      }
+    },
+    "text-embedding-3-small": {
+      "known_text": {
+        "exact_match": 0.245,
+        "bleu": 0.4129829659985858,
+        "rouge_l": 0.7224844873831126,
+        "bertscore_f1": 0.9511713449656963
+      },
+      "unknown_text": {
+        "exact_match": 0.02375,
+        "bleu": 0.13263950724176432,
+        "rouge_l": 0.44417091513076795,
+        "bertscore_f1": 0.8674341248720885
+      },
+      "paraphrase_text": {
+        "exact_match": 0.025,
+        "bleu": 0.2519216361438987,
+        "rouge_l": 0.5785510946804959,
+        "bertscore_f1": 0.9147708212584257
+      },
+      "medical_text": {
+        "exact_match": 0.47375,
+        "bleu": 0.6329122634761222,
+        "rouge_l": 0.8614340539896157,
+        "bertscore_f1": 0.9786951030790806
+      },
+      "code": {
+        "exact_match": 0.2175,
+        "bleu": 0.34554012077821344,
+        "rouge_l": 0.6979464974889746,
+        "bertscore_f1": 0.9472858310490847
+      }
+    },
+    "mistral-embed": {
+      "known_text": {
+        "exact_match": 0.185,
+        "bleu": 0.29889438062214585,
+        "rouge_l": 0.6361350740087923,
+        "bertscore_f1": 0.9368265036493539
+      },
+      "unknown_text": {
+        "exact_match": 0.00375,
+        "bleu": 0.03702641301135537,
+        "rouge_l": 0.26376280131754704,
+        "bertscore_f1": 0.818683878108859
+      },
+      "paraphrase_text": {
+        "exact_match": 0.00625,
+        "bleu": 0.13775213240817683,
+        "rouge_l": 0.4402250539747179,
+        "bertscore_f1": 0.8868445114791393
+      },
+      "medical_text": {
+        "exact_match": 0.31625,
+        "bleu": 0.5135404336061431,
+        "rouge_l": 0.7537388351251515,
+        "bertscore_f1": 0.9623301491886377
+      },
+      "code": {
+        "exact_match": 0.1525,
+        "bleu": 0.26636385136899066,
+        "rouge_l": 0.6476197302255017,
+        "bertscore_f1": 0.936219633743167
+      }
+    }
+  }
+}
