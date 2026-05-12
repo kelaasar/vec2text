@@ -55,7 +55,6 @@ code_keywords = ["code", "python", "javascript", "function", "algorithm",
                  "class", "variable", "loop", "array", "string", "integer"]
 code_texts = [item["user"] for item in one_mil
               if isinstance(item["user"], str) and MIN_LEN <= len(item["user"]) <= MAX_LEN and
-              any(kw in item["user"].lower() for kw in code_keywords)m["user"]) <= MAX_LEN and
               any(kw in item["user"].lower() for kw in code_keywords)]
 random.shuffle(code_texts)
 code = code_texts[:SAMPLE_SIZE]
