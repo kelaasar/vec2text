@@ -33,14 +33,20 @@ CHECKPOINT_FOLDERS_DICT = {
     # "gtr_msmarco__msl128__100epoch": "/home/jxm3/research/retrieval/inversion/saves/d6312870a6f49dee914198d048ee88f4",
     "gtr_msmarco__msl128__100epoch": "/home/wentingz/research/vec2text/vec2text/saves/gtr-1",
     "gtr_msmarco__msl128__2epoch": "/scratch/kelaasar/vec2text/saves/gtr-1",
-    # text-embedding-3-small inverter (5 epochs trained - OVERTRAINED):
-    "openai_3small_msmarco__msl128__5epoch": "/scratch/kelaasar/vec2text/saves/openai-3small-inverter",
+    # gtr corrector (2 epochs trained, 4 GPUs):
+    "gtr_msmarco__msl128__2epoch__correct": "/scratch/kelaasar/vec2text/saves/gtr-corrector-4gpu-2epochs",
     # text-embedding-3-small inverter (2 epochs trained - FIXED):
     "openai_3small_msmarco__msl128__2epoch_fixed": "/scratch/kelaasar/vec2text/saves/openai-3small-inverter-fixed",
+    # text-embedding-3-small corrector (2 epochs trained - FIXED):
+    "openai_3small_msmarco__msl128__2epoch_fixed__correct": "/scratch/kelaasar/vec2text/saves/openai-3small-corrector-fixed",
     # gemini-embedding-001 inverter (2 epochs trained):
     "gemini_embedding_001_msmarco__msl128__2epoch": "/scratch/kelaasar/vec2text/saves/gemini-embedding-001-inverter",
+    # gemini-embedding-001 corrector (2 epochs trained):
+    "gemini_embedding_001_msmarco__msl128__2epoch__correct": "/scratch/kelaasar/vec2text/saves/gemini-embedding-001-corrector",
     # mistral-embed inverter (2 epochs trained):
     "mistral_embed_msmarco__msl128__2epoch": "/scratch/kelaasar/vec2text/saves/mistral-embed-inverter",
+    # mistral-embed corrector (2 epochs trained):
+    "mistral_embed_msmarco__msl128__2epoch__correct": "/scratch/kelaasar/vec2text/saves/mistral-embed-corrector",
     # openai hypothesis model [sl32] [still training, loss 1.233, bleu 29...] https://wandb.ai/jack-morris/emb-inv-3/runs/9b5d4aac9b16dad6d4a8c65cbc1a8859?workspace=user-jxmorris12
     "openai_msmarco__msl32__100epoch": "/home/jxm3/research/retrieval/inversion/saves/61becf9bb1d627272cd1923ac4871e73",
     # openai corrector model [sl32] [loss 0.77, bleu 45]
